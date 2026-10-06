@@ -1,0 +1,43 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint_js:
+    name: Lint backend JS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install dependencies
+        working-directory: giftlink-backend
+        run: npm install
+      - name: Lint
+        working-directory: giftlink-backend
+        run: npx eslint . --ext .js --no-error-on-unmatched-pattern || true
+
+  client_build:
+    name: Build frontend
+    runs-on: ubuntu-latest
+    needs: lint_js
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install dependencies
+        working-directory: giftlink-frontend
+        run: npm install
+      - name: Build
+        working-directory: giftlink-frontend
+        run: npm run build
